@@ -9,6 +9,7 @@ function isItTheEnd(str){
 
 function addNewName(){
     const newName = prompt(NEW_NAME_MSG,'John') || DEFAULT_NAME;
+    
     if (isItTheEnd(newName)){
         btn.removeEventListener('click', addNewName);
     } else {
