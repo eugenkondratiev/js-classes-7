@@ -1,0 +1,49 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link href="css/mainscheet.css" rel="stylesheet" >
+        <h1>Домашная работа. курсы JS. Блок 7</h1>
+
+        <h2>Events</h2>
+        <hr>
+    </head>
+    <body>
+        <!-- <div class="code-window" id="code-window">
+            
+        </div>
+	
+        -->
+<script>
+    function taskInWorkfield(i){
+        const ref = "taskfiles/task"+ i + ".html";
+        const workField = document.getElementById("workfield");
+        workField.setAttribute('data',ref);
+    }
+</script>
+        <nav class="main-menu">
+         <ul class="menu" >
+            <li><a onclick="taskInWorkfield(1)" class="menu-button">Задание 1</a></li>
+            <li><a onclick="taskInWorkfield(2)" class="menu-button">Задание 2</a></li>
+            <li><a onclick="taskInWorkfield(3)" class="menu-button">Задание 3</a></li>
+            <li><a onclick="taskInWorkfield(4)" class="menu-button">Задание 4</a></li>
+            <li><a onclick="taskInWorkfield(5)" class="menu-button">Задание 5</a></li>
+            <li><a onclick="taskInWorkfield(6)" class="menu-button">Задание 6</a></li>
+            <li><a onclick="taskInWorkfield(7)" class="menu-button">Задание 7</a></li>
+         </ul>
+        </nav>   
+    
+        <div class="wrapper" id="field">
+            <div>
+                <object id="workfield"    
+                type="text/html"
+                >
+
+                </object>
+            </div>
+        </div>
+   
+    </body>
+    <footer>
+        <h6> часть вывода информации производится в консоль</h6>
+    </footer>
+</html>
