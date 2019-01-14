@@ -9,7 +9,7 @@ https://jsfiddle.net/kvwnj9pa/
 сделать так, что цвет задавался через аргументы и параметры
  */
 
-//let isChanged = false;
+
 const TO_OFF = true;
 const TO_ON = false;
 const POS_OFF = 2;
@@ -38,9 +38,6 @@ function calculateDeltaColors(colors1, colors2){
 	return deltas;
 }
 const deltaColors = calculateDeltaColors(firstColors,secondColors);
-//console.log(deltaColors);
-
-//let r = 255, g = 255, b = 255;
 
 function getRgb(r,g,b){
 	return "rgb(" + r + "," + g + "," + b + ")";
