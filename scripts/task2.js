@@ -2,7 +2,7 @@ const paragraph = document.querySelector('#paragraph1');
 
 const btn = document.querySelector('button');
 
-let mouseCaption = btn.textContent;
+const mouseCaption = btn.textContent;
 const OVER_MSG = 'Наведен курсор';
 
 

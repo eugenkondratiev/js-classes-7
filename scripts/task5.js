@@ -3,7 +3,7 @@ Type Escape or Stop to finish.`;
 const DEFAULT_NAME = 'Eugen';
 
 function isItTheEnd(str){
-    return str.toLowerCase() == "stop" || str.toLowerCase() == "escape"; 
+    return str.toLowerCase() === 'stop' || str.toLowerCase() === 'escape'; 
 }
 
 

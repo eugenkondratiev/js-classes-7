@@ -14,20 +14,31 @@ const TO_OFF = true;
 const TO_ON = false;
 const POS_OFF = 2;
 const POS_ON = 27;
+const TRANSITION_QUANT = 100;
 
 let colorArray = [255,255,255];
-const firstColors = [180,180,180];
-const secondColors = [50,50,50];
+const firstColors = [250,250,250];
+const secondColors = [150,50,100];
+
+function rampLimitedUp(parameter, delta, maxLimit){
+	parameter += delta;
+	return parameter > maxLimit ? maxLimit : Math.floor(parameter);
+}
+
+function rampLimitedDown(parameter, delta, minLimit){
+	parameter -= delta;
+	return parameter < minLimit ? minLimit : Math.floor(parameter);
+}
 
 function calculateDeltaColors(colors1, colors2){
 	const deltas = [];
 	for(let i = 0; i < colors1.length; i++ ){
-		deltas[i] = Math.floor((colors1[i] - colors2[i])/32);
+		deltas[i] = (colors1[i] - colors2[i])/32;
 	}
 	return deltas;
 }
 const deltaColors = calculateDeltaColors(firstColors,secondColors);
-console.log(deltaColors);
+//console.log(deltaColors);
 
 //let r = 255, g = 255, b = 255;
 
@@ -39,15 +50,6 @@ function getRgbFromArr(arr){
 	return "rgb(" + arr[0] + "," + arr[1] + "," + arr[2] + ")";
 }
 
-// function sliderInfoManager(startColorArray = [255, 255, 255], endColorArray = [100, 100, 100]){
-// 	const color = startColorArray;
-// 	let leftInPx = 2;
-// 	function getColorArray(){
-// 		return color;
-// 	} 
-// 	return getColorArray;
-// };
-
 function incrementPos(left){
 	return parseFloat(left) + 1 + "px"
 }
@@ -56,51 +58,58 @@ function decrementPos(left){
 	return parseFloat(left) - 1 + "px"
 }
  
-function toggleChange(event, startColorArray = [255, 255, 255], endColorArray = [100, 100, 100]){
+function toggleChange(startColorArray = [255, 255, 255], endColorArray = [100, 100, 100]){
 	let colors = [];
-// console.log(colors);
-// console.log(event);
-	if (this.isChanged){
-  	this.isChanged = TO_ON;
-		//body.style.backgroundColor = "white";  
-		colors = endColorArray; 
-		const interval = setInterval(function(){
-    	if (parseFloat(toggleSlider.style.left) < POS_OFF - 2){  
-      	colors = startColorArray;
-				toggleSlider.style.left = POS_OFF + "px";
-      	clearInterval(interval);
-      } else {      	
-				colors = colors.map((c, i) => c + deltaColors[i] );
-      	toggleSlider.style.left = decrementPos(toggleSlider.style.left);
-			}
-			body.style.backgroundColor = getRgbFromArr(colors);
-    },100);
-  } else {
-		this.isChanged = TO_OFF;
-		colors = startColorArray;
-		const interval = setInterval(function(){
-    	if (parseFloat(toggleSlider.style.left) > POS_ON + 2){       	
-      	colors = endColorArray;
-				toggleSlider.style.left = POS_ON + "px";
-      	clearInterval(interval);
-      } else {
-      	colors = colors.map((c, i) => c - deltaColors[i]  );
-       	toggleSlider.style.left = incrementPos(toggleSlider.style.left);
-			}
-			body.style.backgroundColor = getRgbFromArr(colors);
-    },100);
-  }
-}
+
+/**
+ * 
+ * actionToggle(isChanged)  функция плвного премещения слайдера с одновременнім изменением цвета фона
+ */
+	function actionToggle(isChanged){
+	 let left = parseFloat(toggleSlider.style.left );
+		/**плавное перемещение вправо или влево */
+		if (isChanged){
+			colors = colors.map((c, i) => rampLimitedUp(c, deltaColors[i], startColorArray[i]));
+			toggleSlider.style.left = decrementPos(toggleSlider.style.left);
+		} else {
+			colors = colors.map((c, i) => rampLimitedDown(c, deltaColors[i], endColorArray[i]) );
+			toggleSlider.style.left = incrementPos(toggleSlider.style.left); 
+		}
+
+		body.style.backgroundColor = getRgbFromArr(colors);
+
+			  		/**условия окончания включения */
+				if (isChanged && left < POS_OFF - 2){  
+						colors = startColorArray;
+						toggleSlider.style.left = POS_OFF + "px";
+						clearInterval(interval);	
+				}
+				/**условия окончания отключения */
+				if (!isChanged && left > POS_ON + 2){  
+					colors = endColorArray;
+					toggleSlider.style.left = POS_ON + "px";
+					clearInterval(interval);
+				}
+	}
+
+	colors = this.isChanged ? endColorArray : startColorArray;
+	const interval = setInterval(actionToggle, TRANSITION_QUANT, this.isChanged);
+
+this.isChanged = !this.isChanged;
+
+ }
 //============================================================
 
 const body = document.body;
-body.style.backgroundColor = getRgbFromArr(colorArray);
+body.style.backgroundColor = getRgbFromArr(firstColors);
 //============================================================
 const toggleBody = document.createElement("DIV");
 toggleBody.style.width = "45px";
 toggleBody.style.height = "20px";
 toggleBody.style.backgroundColor = "rgb(200, 200, 200)";
 toggleBody.style.borderRadius = "10px";
+
+toggleBody.isChanged = false;
 //============================================================
 const toggleSlider = document.createElement("DIV");
 toggleSlider.style.width = "16px";
@@ -111,10 +120,11 @@ toggleSlider.style.left = "2px";
 toggleSlider.style.backgroundColor = "rgb(230, 230, 230)";
 toggleSlider.style.borderRadius = "8px";
 
-toggleSlider.isChanged = false;
-//const event = toggleBody.onclick;
+// toggleBody.addEventListener("click", function(){
+// 	toggleChange(firstColors, secondColors);
+// }); 
 
-toggleBody.addEventListener("click", toggleChange);//, firstColors, secondColors));
+toggleBody.addEventListener("click",toggleChange.bind(toggleBody, firstColors, secondColors)); 
 
 toggleBody.appendChild(toggleSlider);
 body.appendChild(toggleBody);
