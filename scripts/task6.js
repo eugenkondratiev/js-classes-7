@@ -14,20 +14,28 @@ const TO_OFF = true;
 const TO_ON = false;
 const POS_OFF = 2;
 const POS_ON = 27;
-const TRANSITION_QUANT = 100;
+const TRANSITION_QUANT = 20;
 
-let colorArray = [255,255,255];
+//let colorArray = [255,255,255];
 const firstColors = [250,250,250];
-const secondColors = [150,50,100];
+const secondColors = [
+	getColorInput('red'),
+	getColorInput('green'),
+	getColorInput('blue')
+];
 
-function rampLimitedUp(parameter, delta, maxLimit){
-	parameter += delta;
-	return parameter > maxLimit ? maxLimit : Math.floor(parameter);
+function rampColor(parameter, delta, Limit, direction){
+	parameter -= delta * direction;
+	if (direction < 0){
+		return parameter > Limit ? Limit : Math.floor(parameter);
+	} else {
+		return parameter < Limit ? Limit : Math.floor(parameter);
+	}	
 }
 
-function rampLimitedDown(parameter, delta, minLimit){
-	parameter -= delta;
-	return parameter < minLimit ? minLimit : Math.floor(parameter);
+function getColorInput(color = 'red'){
+	const userInput = +prompt("Input " + color + " from  0 to 255", "100");
+	return Math.floor(userInput) % 256 || 100;
 }
 
 function calculateDeltaColors(colors1, colors2){
@@ -37,6 +45,7 @@ function calculateDeltaColors(colors1, colors2){
 	}
 	return deltas;
 }
+
 const deltaColors = calculateDeltaColors(firstColors,secondColors);
 
 function getRgb(r,g,b){
@@ -45,14 +54,6 @@ function getRgb(r,g,b){
 
 function getRgbFromArr(arr){
 	return "rgb(" + arr[0] + "," + arr[1] + "," + arr[2] + ")";
-}
-
-function incrementPos(left){
-	return parseFloat(left) + 1 + "px"
-}
-
-function decrementPos(left){
-	return parseFloat(left) - 1 + "px"
 }
  
 function toggleChange(startColorArray = [255, 255, 255], endColorArray = [100, 100, 100]){
@@ -64,14 +65,22 @@ function toggleChange(startColorArray = [255, 255, 255], endColorArray = [100, 1
  */
 	function actionToggle(isChanged){
 	 let left = parseFloat(toggleSlider.style.left );
-		/**плавное перемещение вправо или влево */
-		if (isChanged){
-			colors = colors.map((c, i) => rampLimitedUp(c, deltaColors[i], startColorArray[i]));
-			toggleSlider.style.left = decrementPos(toggleSlider.style.left);
-		} else {
-			colors = colors.map((c, i) => rampLimitedDown(c, deltaColors[i], endColorArray[i]) );
-			toggleSlider.style.left = incrementPos(toggleSlider.style.left); 
-		}
+	 const direction = +isChanged * -2 + 1;// -1 or +1
+	 
+	 		/**плавное перемещение вправо или влево */
+	 colors = colors.map((c, i) => rampColor(c, 
+											deltaColors[i], 
+											isChanged ? startColorArray[i] : endColorArray[i], 
+											direction));
+	 toggleSlider.style.left = parseFloat(toggleSlider.style.left) + direction + "px";
+
+		// if (isChanged){
+		// 	colors = colors.map((c, i) => rampLimitedUp(c, deltaColors[i], startColorArray[i]));
+		// 	toggleSlider.style.left = decrementPos(toggleSlider.style.left);
+		// } else {
+		// 	colors = colors.map((c, i) => rampLimitedDown(c, deltaColors[i], endColorArray[i]) );
+		// 	toggleSlider.style.left = incrementPos(toggleSlider.style.left); 
+		// }
 
 		body.style.backgroundColor = getRgbFromArr(colors);
 
@@ -86,7 +95,8 @@ function toggleChange(startColorArray = [255, 255, 255], endColorArray = [100, 1
 					colors = endColorArray;
 					toggleSlider.style.left = POS_ON + "px";
 					clearInterval(interval);
-				}
+				}	
+				toggleSlider.lastPosition = left;
 	}
 
 	colors = this.isChanged ? endColorArray : startColorArray;
@@ -116,6 +126,7 @@ toggleSlider.style.top = "2px";
 toggleSlider.style.left = "2px";
 toggleSlider.style.backgroundColor = "rgb(230, 230, 230)";
 toggleSlider.style.borderRadius = "8px";
+
 
 // toggleBody.addEventListener("click", function(){
 // 	toggleChange(firstColors, secondColors);
